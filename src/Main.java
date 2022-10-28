@@ -18,7 +18,7 @@ public class Main {
         in.nextLine();
 
         GameSystem game = new GameSystem(colors, numSquares);
-        
+
         processCommands(in, game);
 
         in.close();
@@ -30,11 +30,11 @@ public class Main {
             processCommand(command, in, game);
             command = in.next();
         }
-        
+
         processExitCommand(game);
-        
+
     }
-    
+
     private static void processCommand(String command, Scanner in, GameSystem game) {
         switch (command) {
             case PLAYER:
@@ -42,57 +42,92 @@ public class Main {
                 break;
             case SQUARE:
                 processSquareCommand(in, game);
-                break;            
+                break;
             case STATUS:
                 processStatusCommand(in, game);
                 break;
             case DICE:
                 processDiceCommmand(in, game);
-                break;                
+                break;
             default:
                 showInvalidCommand();
                 break;
 
-
         }
-        
+
         in.nextLine();
     }
-    
+
     private static void processDiceCommmand(Scanner in, GameSystem game) {
         int pointsDice1 = in.nextInt();
-        int pointDice2 = in.nextInt();
-        System.out.println("Tou no Dice TODO");
+        int pointsDice2 = in.nextInt();
+        if(!game.isDiceValid(pointsDice1, pointsDice2)) {
+            System.out.println("Invalid dice");
+            return;
+        }
+
+        if(game.isGameOver()) {
+            displayGameIsOver();
+            return;
+        }
+
+        game.rollDice(pointsDice1, pointsDice2);
+    }
+
+    private static void displayGameIsOver() {
+        System.out.println("The game is over");
     }
 
     private static void processStatusCommand(Scanner in, GameSystem game) {
         String playerColor = in.next();
-        System.out.printf("%s can roll the dice TODO \n", playerColor); 
+        if (!game.isValidPlayer(playerColor)) {
+            displayNonexistentPlayer();
+            return;
+        }
+
+        if (game.isGameOver()) {
+            displayGameIsOver();
+            return;
+        }
+
+        if (game.canRollDice(playerColor)) {
+            System.out.printf("%s can roll the dice\n", playerColor);
+        } else {
+            System.out.printf("%s cannot roll the dice\n", playerColor);
+        }
 
     }
 
     private static void processSquareCommand(Scanner in, GameSystem game) {
         String playerColor = in.next();
-        System.out.printf("%s is on square TODO\n", playerColor );
+        if (!game.isValidPlayer(playerColor)) {
+            displayNonexistentPlayer();
+            return;
+        }
+
+        int playerSquare = game.getPlayerSquare(playerColor);
+        System.out.printf("%s is on square %d\n", playerColor, playerSquare);
+    }
+
+    private static void displayNonexistentPlayer() {
+        System.out.println("Nonexistent player");
     }
 
     private static void processPlayerCommand(Scanner in, GameSystem game) {
-        
+
         System.out.printf("Next to play: %s\n", game.getNextPlayerName());
- 
+
     }
 
     private static void showInvalidCommand() {
         System.out.println("Invalid command");
     }
-    
 
-    
     private static void processExitCommand(GameSystem game) {
-
-        System.out.println("to do exit");
+        if(game.isGameOver()) {
+            System.out.printf("%s won the game!\n", game.getWinnerName());
+        } else {
+            System.out.println("The game was not over yet...");
+        }
     }
-
-
-    
 }
