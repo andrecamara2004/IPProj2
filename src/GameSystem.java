@@ -1,5 +1,9 @@
 public class GameSystem {
 
+    /**
+     *
+     */
+    private static final int NOT_FOUND = -1;
     private static final int MAX_POINTS_DICE = 6;
     private static final int MIN_POINTS_DICE = 1;
 
@@ -17,16 +21,22 @@ public class GameSystem {
         this.winner = null;
     }
 
-    private Player[] createPlayersFromColors(String colors) {
-        Player[] players = new Player[1];
-        players[0] = new Player("A");
-        // int numPlayers = colors.length();
-        // Player[] players = new Player[numPlayers];
-        // for (int i = 0; i < numPlayers; i++) {
-        //     String color = colors.charAt(i);
-        //     players[i] = new Player(color);
-        // }
+    private static Player[] createPlayersFromColors(String colors) {
+        int numPlayers = colors.length();
+        Player[] players = new Player[numPlayers];
+        for( int i = 0 ; i < numPlayers ; i++) {
+            String playerName = convertCharAtPosToString(colors, i);
+            players[i] = new Player(playerName);
+        }
+
         return players;
+    }
+
+    private static String convertCharAtPosToString(String colors, int i) {
+        char[] nameChars = new char[1];
+        nameChars[0] = colors.charAt(i);
+        String playerName = new String(nameChars);
+        return playerName;
     }
 
     public String getNextPlayerName() {
@@ -37,12 +47,32 @@ public class GameSystem {
         return players[nextPlayerPos];
     }
 
-    public int getPlayerSquare(String playerColor) {
-        return players[0].getSquare();
+    // Pre: isValidPlayer(playerName)
+    public int getPlayerSquare(String playerName) {
+        int i = findFirstIndexOfPlayer(playerName);
+        
+        return players[i].getSquare();
     }
 
+    private int findFirstIndexOfPlayer(String playerName) {
+        int i = 0;
+        while(i < players.length && !players[i].hasName(playerName)) {
+            i++;
+        }
+        
+        if(i < players.length) {
+            return i;
+        } else {
+            return NOT_FOUND;
+        }
+    }
+    
+
     public boolean isValidPlayer(String playerName) {
-        return players[0].hasName(playerName);
+        int i = findFirstIndexOfPlayer(playerName);
+        
+        return i != NOT_FOUND;
+        
     }
 
     public boolean isGameOver() {
@@ -75,6 +105,17 @@ public class GameSystem {
         }
         
         nextPlayer.setSquare(newSquare);
+        updateNextPlayer();
+
+
+    }
+
+    private void updateNextPlayer() {
+        if(nextPlayerPos == players.length - 1)  {
+            nextPlayerPos = 0;
+        } else {
+            nextPlayerPos++;
+        }
 
     }
 
