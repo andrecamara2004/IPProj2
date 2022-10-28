@@ -67,13 +67,13 @@ public class Main {
 
     private static void processStatusCommand(Scanner in, GameSystem game) {
         String playerColor = in.next();
-        System.out.printf("%s can roll the dice TODO\n", playerColor); 
+        System.out.printf("%s can roll the dice TODO \n", playerColor); 
 
     }
 
     private static void processSquareCommand(Scanner in, GameSystem game) {
         String playerColor = in.next();
-        System.out.printf("%s is on square TO DO\n", playerColor );
+        System.out.printf("%s is on square TODO\n", playerColor );
     }
 
     private static void processPlayerCommand(Scanner in, GameSystem game) {
