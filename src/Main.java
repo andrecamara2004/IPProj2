@@ -77,7 +77,8 @@ public class Main {
     }
 
     private static void processPlayerCommand(Scanner in, GameSystem game) {
-        System.out.println("Estou no player");
+        
+        System.out.printf("Next to play: %s\n", game.getNextPlayerName());
  
     }
 
