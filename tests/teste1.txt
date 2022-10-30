@@ -1,0 +1,27 @@
+RGB
+25
+2
+7 17
+3
+6 20 24
+player
+square B
+dice 1 6
+dice 6 3
+player
+square G
+status R
+dice 3 6
+dice 1 1
+dice 6 6
+dice 4 5
+dice 4 3
+square G
+square R
+square B
+status B
+status R
+dice 5 5
+status B
+square G
+exit

@@ -1,0 +1,31 @@
+WYM
+25
+2
+7 17
+3
+6 20 24
+square R
+dice 2 4
+dice 5 3
+eXiT
+dice 1 1
+casa red
+player
+status W
+dice 1 1
+dice 1 7
+dice 2 1
+square W
+player
+status W
+dice 4 4
+dice 2 3
+square Y
+square M
+dice 5 6
+dice 0 4
+dice 1 4
+square Y
+status Y
+status marca gira!
+exit

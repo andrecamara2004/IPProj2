@@ -103,25 +103,25 @@ public class GameSystem {
         Player nextPlayer = getNextPlayer();
         int newSquare = nextPlayer.getSquare() + totalDicePoints;
 
-        
         // Check if player went into a bird square
         if (isBirdSquare(newSquare)) {
             newSquare = newSquare + BIRD_SQUARE_POSITIONS;
-        } else if(isCliffSquare(newSquare)) {
+        } else if (isCliffSquare(newSquare)) {
             newSquare = nextPlayer.getSquare() - totalDicePoints;
-            if(newSquare < START_SQUARE) {
+            if (newSquare < START_SQUARE) {
                 newSquare = START_SQUARE;
             }
-        } else if(isChargeSquare(newSquare)) {
+        } else if (isChargeSquare(newSquare)) {
             nextPlayer.setCharges(CHARGES_VALUE);
         }
-        
+
         // Check if game ended after the play
         if (newSquare >= numSquares) {
             newSquare = numSquares;
             gameOver = true;
             winner = nextPlayer;
         }
+        
         nextPlayer.setSquare(newSquare);
         updateNextPlayer();
 
@@ -137,9 +137,9 @@ public class GameSystem {
 
     private boolean squareExistsInArray(int newSquare, int[] array) {
         int i = 0;
-        while(i < array.length && array[i] != newSquare) {
+        while (i < array.length && array[i] != newSquare) {
             i++;
-        } 
+        }
         return i < array.length;
     }
 
@@ -149,11 +149,11 @@ public class GameSystem {
                 newSquare < numSquares;
     }
 
-    private void updateNextPlayer() {      
+    private void updateNextPlayer() {
         updateNextPlayerPos();
-        
-        //Skip player that has charges to pay 
-        while(players[nextPlayerPos].hasCharges()) {
+
+        // Skip player that has charges to pay
+        while (players[nextPlayerPos].hasCharges()) {
             players[nextPlayerPos].payCharge();
             updateNextPlayerPos();
         }

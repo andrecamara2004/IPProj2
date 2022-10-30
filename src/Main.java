@@ -65,28 +65,26 @@ public class Main {
                 processDiceCommmand(in, game);
                 break;
             default:
-                showInvalidCommand();
+                showInvalidCommand(in);
                 break;
 
         }
-
-        in.nextLine();
     }
 
     private static void processDiceCommmand(Scanner in, GameSystem game) {
         int pointsDice1 = in.nextInt();
         int pointsDice2 = in.nextInt();
+        in.nextLine();
+        
         if (!GameSystem.isDiceValid(pointsDice1, pointsDice2)) {
             System.out.println("Invalid dice");
-            return;
-        }
-
-        if (game.isGameOver()) {
+        } else if (game.isGameOver()) {
             displayGameIsOver();
-            return;
+        } else {
+            game.rollDice(pointsDice1, pointsDice2);
         }
 
-        game.rollDice(pointsDice1, pointsDice2);
+
     }
 
     private static void displayGameIsOver() {
@@ -94,7 +92,7 @@ public class Main {
     }
 
     private static void processStatusCommand(Scanner in, GameSystem game) {
-        String playerColor = in.next();
+        String playerColor = readPlayerColorToTheEndOfLine(in);
         if (!game.isValidPlayer(playerColor)) {
             displayNonexistentPlayer();
             return;
@@ -114,7 +112,7 @@ public class Main {
     }
 
     private static void processSquareCommand(Scanner in, GameSystem game) {
-        String playerColor = in.next();
+        String playerColor = readPlayerColorToTheEndOfLine(in);
         if (!game.isValidPlayer(playerColor)) {
             displayNonexistentPlayer();
             return;
@@ -124,17 +122,27 @@ public class Main {
         System.out.printf("%s is on square %d\n", playerColor, playerSquare);
     }
 
+    private static String readPlayerColorToTheEndOfLine(Scanner in) {
+
+        return in.next() + in.nextLine();
+    }
+
     private static void displayNonexistentPlayer() {
         System.out.println("Nonexistent player");
     }
 
     private static void processPlayerCommand(Scanner in, GameSystem game) {
 
-        System.out.printf("Next to play: %s\n", game.getNextPlayerName());
-
+        in.nextLine();
+        if(game.isGameOver()) {
+            displayGameIsOver();
+        } else {
+            System.out.printf("Next to play: %s\n", game.getNextPlayerName());
+        }
     }
 
-    private static void showInvalidCommand() {
+    private static void showInvalidCommand(Scanner in) {
+        in.nextLine();
         System.out.println("Invalid command");
     }
 
