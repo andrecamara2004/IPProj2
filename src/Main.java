@@ -13,15 +13,30 @@ public class Main {
         Scanner in = new Scanner(System.in);
 
         String colors = in.nextLine();
-        int numSquares = in.nextInt();
 
+        int numSquares = in.nextInt();
         in.nextLine();
 
-        GameSystem game = new GameSystem(colors, numSquares);
+        int numCharges = in.nextInt();
+        int[] chargesSquares = createArrayOfSquares(numCharges, in);
+
+        int numCliffs = in.nextInt();
+        int[] cliffsSquares = createArrayOfSquares(numCliffs, in);
+
+        GameSystem game = new GameSystem(colors, numSquares, chargesSquares, cliffsSquares);
 
         processCommands(in, game);
 
         in.close();
+    }
+
+    private static int[] createArrayOfSquares(int numItens, Scanner in) {
+        int[] createArrayOfSquares = new int[numItens];
+        for (int i = 0; i < numItens; i++) {
+            createArrayOfSquares[i] = in.nextInt();
+        }
+        in.nextLine();
+        return createArrayOfSquares;
     }
 
     private static void processCommands(Scanner in, GameSystem game) {
@@ -61,12 +76,12 @@ public class Main {
     private static void processDiceCommmand(Scanner in, GameSystem game) {
         int pointsDice1 = in.nextInt();
         int pointsDice2 = in.nextInt();
-        if(!game.isDiceValid(pointsDice1, pointsDice2)) {
+        if (!GameSystem.isDiceValid(pointsDice1, pointsDice2)) {
             System.out.println("Invalid dice");
             return;
         }
 
-        if(game.isGameOver()) {
+        if (game.isGameOver()) {
             displayGameIsOver();
             return;
         }
@@ -124,7 +139,7 @@ public class Main {
     }
 
     private static void processExitCommand(GameSystem game) {
-        if(game.isGameOver()) {
+        if (game.isGameOver()) {
             System.out.printf("%s won the game!\n", game.getWinnerName());
         } else {
             System.out.println("The game was not over yet...");

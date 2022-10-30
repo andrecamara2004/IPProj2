@@ -1,0 +1,30 @@
+XYZ
+18
+2
+5 10
+1
+11
+dice 2 2
+dice 2 3
+dice 6 3
+status X
+status Z
+player
+dice 1 1
+status X
+status Z
+player
+dice 2 1
+status X
+status Y
+status Z
+player
+dice 3 2
+square X
+status X
+status Y
+status Z
+square Y
+square Z
+player
+exit
