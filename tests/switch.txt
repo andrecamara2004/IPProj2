@@ -1,0 +1,14 @@
+boolean continue = true;
+
+do {
+   String command = nextCommand(in);
+   switch (command) {
+	case SAIR:
+		processExit();
+		continue = false;
+		break;
+
+
+   }
+
+} while (continue);
