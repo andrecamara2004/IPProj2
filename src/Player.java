@@ -11,6 +11,8 @@ public class Player {
     private String name;
     private int square;
     private int charges;
+    private boolean eliminated;
+    private boolean firstMove;
 
     // constructors
 
@@ -24,10 +26,24 @@ public class Player {
         this.name = name;
         this.square = 1;
         this.charges = 0;
+        this.eliminated = false;
+        this.firstMove = true;
 
     }
 
     // methods
+
+    public boolean isFirstMove() {
+        return firstMove;
+    }
+
+    public void markAsEliminate() {
+        eliminated = true;
+    }
+
+    public boolean isEliminated() {
+        return eliminated;
+    }
 
     /**
      * @return The name of the player
@@ -59,6 +75,7 @@ public class Player {
      */
     public void setSquare(int newSquare) {
         square = newSquare;
+        firstMove = false;
     }
 
     /**

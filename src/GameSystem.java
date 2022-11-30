@@ -7,48 +7,44 @@
 public class GameSystem {
 
     // constants
-    private static final int CHARGES_VALUE = 2;
     private static final int BIRD_SQUARE_POSITIONS = 9;
     private static final int NOT_FOUND = -1;
     private static final int MAX_POINTS_DICE = 6;
     private static final int MIN_POINTS_DICE = 1;
-    private static final int START_SQUARE = 1;
 
     // instance variables
-    private int numSquares;
     private Player[] players;
     private int nextPlayerPos;
     private boolean gameOver;
     private Player winner;
-    private int[] chargesSquares;
-    private int[] cliffsSquares;
+    private Board board;
 
     // constructors
 
     /**
      * Constructor:
      * 
-     * @param colors: the String given that will lead to the name of the players
-     * @param numSquares: the ammount of squares that the game has
+     * @param colors:         the String given that will lead to the name of the
+     *                        players
+     * @param numSquares:     the ammount of squares that the game has
      * @param chargesSquares: the squares that charges on it
-     * @param cliffsSquares: the squares that has cliffs on it
+     * @param cliffsSquares:  the squares that has cliffs on it
      * @pre: numSquares >= 10 && numSquares <= 150 && colors != null
      */
     public GameSystem(String colors, int numSquares, int[] chargesSquares, int[] cliffsSquares) {
-        this.numSquares = numSquares;
         this.players = createPlayersFromColors(colors);
         this.nextPlayerPos = 0;
         this.gameOver = false;
         this.winner = null;
-        this.chargesSquares = chargesSquares;
-        this.cliffsSquares = cliffsSquares;
+        this.board = new Board(numSquares, chargesSquares, cliffsSquares);
     }
 
     // methods
 
     /**
      * Creates the players using the String colors
-     * @param colors: the String given that will lead to the name of the players 
+     * 
+     * @param colors: the String given that will lead to the name of the players
      * @return an array of Players
      */
     private static Player[] createPlayersFromColors(String colors) {
@@ -65,7 +61,8 @@ public class GameSystem {
     /**
      * Creating an array of char with lenght of 1 index that will lead to a String
      * that will be the name of the player
-     * @param colors: the String given that will lead to the name of the players 
+     * 
+     * @param colors: the String given that will lead to the name of the players
      * @return the name of the player
      */
     private static String convertCharAtPosToString(String colors, int i) {
@@ -77,6 +74,7 @@ public class GameSystem {
 
     /**
      * Gives the name of the player that will be playing next play
+     * 
      * @return the name of the player
      */
     public String getNextPlayerName() {
@@ -85,6 +83,7 @@ public class GameSystem {
 
     /**
      * Chooses the player that will be playing next play
+     * 
      * @return the player
      */
     private Player getNextPlayer() {
@@ -93,6 +92,7 @@ public class GameSystem {
 
     /**
      * Gives the square of the player
+     * 
      * @param playerName: the name of the player
      * @return the square of the player
      * @pre: isValidPlayer(playerName)
@@ -105,6 +105,7 @@ public class GameSystem {
 
     /**
      * Searches if the player exists
+     * 
      * @param playerName: the name of the player
      * @return the first index of the array that equals to playerName
      */
@@ -123,6 +124,7 @@ public class GameSystem {
 
     /**
      * Indicates if playerName is valid
+     * 
      * @param playerName
      * @return true, if the player exists
      */
@@ -135,6 +137,7 @@ public class GameSystem {
 
     /**
      * Indicates if the game is over
+     * 
      * @return true, if game is over
      */
     public boolean isGameOver() {
@@ -143,6 +146,7 @@ public class GameSystem {
 
     /**
      * Indicates if player can roll the dice
+     * 
      * @param playerColor
      * @return true, if player can roll the dice
      */
@@ -152,6 +156,7 @@ public class GameSystem {
 
     /**
      * Indicates if the dice is valid
+     * 
      * @param pointsDice1: the number of dice1 spots
      * @param pointsDice2: the number of dice2 spots
      * @return true if the number of spots of both dices is valid
@@ -162,7 +167,8 @@ public class GameSystem {
 
     /**
      * Indicates if the number of spots of the dice is valid
-     * @param pointsDice1: the number of dice spots 
+     * 
+     * @param pointsDice1: the number of dice spots
      * @return true if the number of spots of the dice is valid
      */
     private static boolean isDicePointsValid(int pointsDice1) {
@@ -171,6 +177,7 @@ public class GameSystem {
 
     /**
      * player plays depending on the manager of the game
+     * 
      * @param pointsDice1
      * @param pointsDice2
      * @pre: isDiceValid(pointsDice1, pointsDice2)
@@ -180,17 +187,23 @@ public class GameSystem {
         Player nextPlayer = getNextPlayer();
         int newSquare = nextPlayer.getSquare() + totalDicePoints;
 
-        newSquare = checkNewSquare(totalDicePoints, nextPlayer, newSquare);
-
-        // Check if game ended after the play
-        if (newSquare >= numSquares) {
-            newSquare = numSquares;
+        if (pointsDice1 == 3 && pointsDice2 == 6 || pointsDice1 == 6 && pointsDice2 == 3) {
             setGameOver(nextPlayer);
-        } else {
-            nextPlayer.setSquare(newSquare);
-            updateNextPlayer();
         }
 
+        if (totalDicePoints == 9 && pointsDice1 % 3 == 0 && nextPlayer.isFirstMove() == true) {
+            newSquare = board.getLastSquare();
+        } else {
+            newSquare = checkNewSquare(totalDicePoints, nextPlayer, newSquare);
+        }
+
+        // Check if game ended after the play
+        nextPlayer.setSquare(newSquare);
+        if (board.isLastSquare(newSquare)) {
+            setGameOver(nextPlayer);
+        } else {
+            updateNextPlayer();
+        }
 
     }
 
@@ -199,9 +212,9 @@ public class GameSystem {
         winner = playerWinner;
     }
 
-    
     /**
      * Verify new square, checking for charges, cliffs and birds
+     * 
      * @param totalDicePoints
      * @param nextPlayer
      * @param newSquare
@@ -209,62 +222,18 @@ public class GameSystem {
      */
     private int checkNewSquare(int totalDicePoints, Player nextPlayer, int newSquare) {
         // Check if player went into a bird square
-        if (isBirdSquare(newSquare)) {
+        if (board.isBirdSquare(newSquare)) {
             newSquare = newSquare + BIRD_SQUARE_POSITIONS;
-        // Check if player went into a cliff square    
-        } else if (isCliffSquare(newSquare)) {
+            // Check if player went into a cliff square
+        } else if (board.isCliffSquare(newSquare)) {
             newSquare = nextPlayer.getSquare() - totalDicePoints;
-            if (newSquare < START_SQUARE) {
-                newSquare = START_SQUARE;
-            }
-        // Check if player went into a charge square        
-        } else if (isChargeSquare(newSquare)) {
-            nextPlayer.setCharges(CHARGES_VALUE);
+
+            // Check if player went into a charge square
+        } else if (board.isChargeSquare(newSquare)) {
+            nextPlayer.setCharges(board.getChargeValue(newSquare));
         }
-        return newSquare;
-    }
 
-    /**
-     * Indicates if new square is a charge square
-     * @param newSquare
-     * @return true if new square is a charge square
-     */
-    private boolean isChargeSquare(int newSquare) {
-        return squareExistsInArray(newSquare, chargesSquares);
-    }
-
-    /**
-     * Indicates if new square is a cliff square
-     * @param newSquare
-     * @return true if new square is a cliff square
-     */
-    private boolean isCliffSquare(int newSquare) {
-        return squareExistsInArray(newSquare, cliffsSquares);
-    }
-
-    /**
-     * Indicates if new square is valid
-     * @param newSquare
-     * @param array: the array of squares
-     * @return true if new square is valid
-     */
-    private boolean squareExistsInArray(int newSquare, int[] array) {
-        int i = 0;
-        while (i < array.length && array[i] != newSquare) {
-            i++;
-        }
-        return i < array.length;
-    }
-
-    /**
-     * Indicates if new square is a bird square
-     * @param newSquare
-     * @return true if new square is a bird square
-     */
-    private boolean isBirdSquare(int newSquare) {
-        return newSquare % BIRD_SQUARE_POSITIONS == 0 &&
-                newSquare > 1 &&
-                newSquare < numSquares;
+        return board.ensureInsideBoard(newSquare);
     }
 
     // Skip player that has charges to pay
@@ -288,6 +257,7 @@ public class GameSystem {
 
     /**
      * Gives the name of the player that won the game
+     * 
      * @return the name of the player that won the game
      * @pre: isGameOver()
      */
