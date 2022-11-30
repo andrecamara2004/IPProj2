@@ -11,6 +11,7 @@ public class GameSystem {
     private static final int NOT_FOUND = -1;
     private static final int MAX_POINTS_DICE = 6;
     private static final int MIN_POINTS_DICE = 1;
+    
 
     // instance variables
     private Player[] players;
@@ -31,12 +32,12 @@ public class GameSystem {
      * @param cliffsSquares:  the squares that has cliffs on it
      * @pre: numSquares >= 10 && numSquares <= 150 && colors != null
      */
-    public GameSystem(String colors, int numSquares, int[] chargesSquares, int[] cliffsSquares) {
+    public GameSystem(String colors, int numSquares, Charge[] charges, Cliff[] cliffs) {
         this.players = createPlayersFromColors(colors);
         this.nextPlayerPos = 0;
         this.gameOver = false;
         this.winner = null;
-        this.board = new Board(numSquares, chargesSquares, cliffsSquares);
+        this.board = new Board(numSquares, charges, cliffs);
     }
 
     // methods
@@ -187,10 +188,6 @@ public class GameSystem {
         Player nextPlayer = getNextPlayer();
         int newSquare = nextPlayer.getSquare() + totalDicePoints;
 
-        if (pointsDice1 == 3 && pointsDice2 == 6 || pointsDice1 == 6 && pointsDice2 == 3) {
-            setGameOver(nextPlayer);
-        }
-
         if (totalDicePoints == 9 && pointsDice1 % 3 == 0 && nextPlayer.isFirstMove() == true) {
             newSquare = board.getLastSquare();
         } else {
@@ -226,7 +223,14 @@ public class GameSystem {
             newSquare = newSquare + BIRD_SQUARE_POSITIONS;
             // Check if player went into a cliff square
         } else if (board.isCliffSquare(newSquare)) {
-            newSquare = nextPlayer.getSquare() - totalDicePoints;
+            Cliff cliff = board.getCliff(newSquare);
+            if(cliff.isCrab()) {
+                newSquare = nextPlayer.getSquare() - totalDicePoints;
+            } else if(cliff.isDeath()) {
+                nextPlayer.markAsEliminate();
+            } else if(cliff.isHell()) {
+                newSquare = board.getInitialSquare();
+            }
 
             // Check if player went into a charge square
         } else if (board.isChargeSquare(newSquare)) {
@@ -240,8 +244,11 @@ public class GameSystem {
     private void updateNextPlayer() {
         updateNextPlayerPos();
 
-        while (players[nextPlayerPos].hasCharges()) {
-            players[nextPlayerPos].payCharge();
+        //TODO melhorar este codigo
+        while (players[nextPlayerPos].hasCharges() || players[nextPlayerPos].isEliminated()) {
+            if(players[nextPlayerPos].hasCharges()){
+                players[nextPlayerPos].payCharge();
+            }
             updateNextPlayerPos();
         }
     }

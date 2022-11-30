@@ -36,12 +36,12 @@ public class Main {
         in.nextLine();
 
         int numCharges = in.nextInt();
-        int[] chargesSquares = createArrayOfSquares(numCharges, in);
+        Charge[] charges = createArrayOfCharges(numCharges, in);
 
         int numCliffs = in.nextInt();
-        int[] cliffsSquares = createArrayOfSquares(numCliffs, in);
+        Cliff[] cliffs = createArrayOfCliffs(numCliffs, in);
 
-        GameSystem game = new GameSystem(colors, numSquares, chargesSquares, cliffsSquares);
+        GameSystem game = new GameSystem(colors, numSquares, charges, cliffs);
 
         processCommands(in, game);
 
@@ -50,20 +50,33 @@ public class Main {
 
     // methods
 
+    private static Cliff[] createArrayOfCliffs(int numCliffs, Scanner in) {
+        Cliff[] cliffs = new Cliff[numCliffs];
+        for (int i = 0; i < numCliffs; i++) {
+            cliffs[i] = new Cliff(in.nextInt(), in.next());
+            in.nextLine();
+
+        }
+
+        return cliffs;
+    }
+
     /**
      * Creates an array with lenght equals to numSquares
      * 
-     * @param numItens
+     * @param numCharges
      * @param in
      * @return an array of the squares
      */
-    private static int[] createArrayOfSquares(int numItens, Scanner in) {
-        int[] createArrayOfSquares = new int[numItens];
-        for (int i = 0; i < numItens; i++) {
-            createArrayOfSquares[i] = in.nextInt();
+    private static Charge[] createArrayOfCharges(int numCharges, Scanner in) {
+        Charge[] charges = new Charge[numCharges];
+        for (int i = 0; i < numCharges; i++) {
+            charges[i] = new Charge(in.nextInt(), in.nextInt());
+            in.nextLine();
+
         }
-        in.nextLine();
-        return createArrayOfSquares;
+
+        return charges;
     }
 
     /**
