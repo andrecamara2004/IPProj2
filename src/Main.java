@@ -41,7 +41,7 @@ public class Main {
         int numCliffs = in.nextInt();
         Cliff[] cliffs = createArrayOfCliffs(numCliffs, in);
 
-        GameSystem game = new GameSystem(colors, numSquares, charges, cliffs);
+        Game game = new Game(colors, numSquares, charges, cliffs);
 
         processCommands(in, game);
 
@@ -85,7 +85,7 @@ public class Main {
      * @param in:   the input
      * @param game: the object GameSystem
      */
-    private static void processCommands(Scanner in, GameSystem game) {
+    private static void processCommands(Scanner in, Game game) {
         String command;
         do {
             command = in.next();
@@ -101,7 +101,7 @@ public class Main {
      * @param in
      * @param game
      */
-    private static void processCommand(String command, Scanner in, GameSystem game) {
+    private static void processCommand(String command, Scanner in, Game game) {
         switch (command) {
             case PLAYER:
                 processPlayerCommand(in, game);
@@ -131,12 +131,12 @@ public class Main {
      * @param in
      * @param game
      */
-    private static void processDiceCommmand(Scanner in, GameSystem game) {
+    private static void processDiceCommmand(Scanner in, Game game) {
         int pointsDice1 = in.nextInt();
         int pointsDice2 = in.nextInt();
         in.nextLine();
 
-        if (!GameSystem.isDiceValid(pointsDice1, pointsDice2)) {
+        if (!Game.isDiceValid(pointsDice1, pointsDice2)) {
             System.out.println("Invalid dice");
         } else if (game.isGameOver()) {
             displayGameIsOver();
@@ -159,7 +159,7 @@ public class Main {
      * @param in
      * @param game
      */
-    private static void processStatusCommand(Scanner in, GameSystem game) {
+    private static void processStatusCommand(Scanner in, Game game) {
         String playerColor = readPlayerColorToTheEndOfLine(in);
         if (!game.isValidPlayer(playerColor)) {
             displayNonexistentPlayer();
@@ -178,7 +178,7 @@ public class Main {
      * @param in
      * @param game
      */
-    private static void processSquareCommand(Scanner in, GameSystem game) {
+    private static void processSquareCommand(Scanner in, Game game) {
         String playerColor = readPlayerColorToTheEndOfLine(in);
         if (!game.isValidPlayer(playerColor)) {
             displayNonexistentPlayer();
@@ -213,7 +213,7 @@ public class Main {
      * @param in
      * @param game
      */
-    private static void processPlayerCommand(Scanner in, GameSystem game) {
+    private static void processPlayerCommand(Scanner in, Game game) {
 
         in.nextLine();
         if (game.isGameOver()) {
@@ -234,7 +234,7 @@ public class Main {
      * 
      * @param game: the object game system
      */
-    private static void processExitCommand(GameSystem game) {
+    private static void processExitCommand(Game game) {
         if (game.isGameOver()) {
             System.out.printf("%s won the game!\n", game.getWinnerName());
         } else {

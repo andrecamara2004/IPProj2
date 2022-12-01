@@ -31,4 +31,8 @@ public class Cliff {
     public boolean hasSquare(int otherSquare) {
         return square == otherSquare;
     }
+
+    public void eraseCliff() {
+        square = -1;
+    }
 }

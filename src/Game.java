@@ -4,7 +4,7 @@
  * 
  */
 
-public class GameSystem {
+public class Game {
 
     // constants
     private static final int BIRD_SQUARE_POSITIONS = 9;
@@ -32,7 +32,7 @@ public class GameSystem {
      * @param cliffsSquares:  the squares that has cliffs on it
      * @pre: numSquares >= 10 && numSquares <= 150 && colors != null
      */
-    public GameSystem(String colors, int numSquares, Charge[] charges, Cliff[] cliffs) {
+    public Game(String colors, int numSquares, Charge[] charges, Cliff[] cliffs) {
         this.players = createPlayersFromColors(colors);
         this.nextPlayerPos = 0;
         this.gameOver = false;
@@ -228,8 +228,12 @@ public class GameSystem {
                 newSquare = nextPlayer.getSquare() - totalDicePoints;
             } else if(cliff.isDeath()) {
                 nextPlayer.markAsEliminate();
+                //TODO after one player enters a death cliff, all death cliffs must be erased
+                board.eraseDeathCliffs();
             } else if(cliff.isHell()) {
                 newSquare = board.getInitialSquare();
+            } else if(cliff.getSquare() == -1){
+                newSquare = newSquare + 0;
             }
 
             // Check if player went into a charge square
