@@ -5,6 +5,7 @@
  * the GameSystem class
  */
 
+import java.io.FileNotFoundException;
 import java.util.Scanner;
 
 public class Main {
@@ -15,6 +16,7 @@ public class Main {
     private static final String SQUARE = "square";
     private static final String PLAYER = "player";
     private static final String EXIT = "exit";
+    private static final String BOARDS_REPO_FILE_NAME = "boards.txt";
 
     /**
      * Main program:
@@ -26,22 +28,19 @@ public class Main {
      * 
      * @param args
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws FileNotFoundException{
 
         Scanner in = new Scanner(System.in);
 
         String colors = in.nextLine();
 
-        int numSquares = in.nextInt();
+        int boardNumber = in.nextInt();
         in.nextLine();
 
-        int numCharges = in.nextInt();
-        Charge[] charges = createArrayOfCharges(numCharges, in);
+        BoardsRepo boardRepo = new BoardsRepo(BOARDS_REPO_FILE_NAME);
+        Board board = boardRepo.getBoardByNumber(boardNumber);
 
-        int numCliffs = in.nextInt();
-        Cliff[] cliffs = createArrayOfCliffs(numCliffs, in);
-
-        Game game = new Game(colors, numSquares, charges, cliffs);
+        Game game = new Game(colors, board);
 
         processCommands(in, game);
 
@@ -50,34 +49,6 @@ public class Main {
 
     // methods
 
-    private static Cliff[] createArrayOfCliffs(int numCliffs, Scanner in) {
-        Cliff[] cliffs = new Cliff[numCliffs];
-        for (int i = 0; i < numCliffs; i++) {
-            cliffs[i] = new Cliff(in.nextInt(), in.next());
-            in.nextLine();
-
-        }
-
-        return cliffs;
-    }
-
-    /**
-     * Creates an array with lenght equals to numSquares
-     * 
-     * @param numCharges
-     * @param in
-     * @return an array of the squares
-     */
-    private static Charge[] createArrayOfCharges(int numCharges, Scanner in) {
-        Charge[] charges = new Charge[numCharges];
-        for (int i = 0; i < numCharges; i++) {
-            charges[i] = new Charge(in.nextInt(), in.nextInt());
-            in.nextLine();
-
-        }
-
-        return charges;
-    }
 
     /**
      * Creation of the processor of commands

@@ -19,6 +19,7 @@ public class Game {
     private boolean gameOver;
     private Player winner;
     private Board board;
+    private boolean skipDeathCliff;
 
     // constructors
 
@@ -32,12 +33,13 @@ public class Game {
      * @param cliffsSquares:  the squares that has cliffs on it
      * @pre: numSquares >= 10 && numSquares <= 150 && colors != null
      */
-    public Game(String colors, int numSquares, Charge[] charges, Cliff[] cliffs) {
+    public Game(String colors, Board board) {
         this.players = createPlayersFromColors(colors);
         this.nextPlayerPos = 0;
         this.gameOver = false;
         this.winner = null;
-        this.board = new Board(numSquares, charges, cliffs);
+        this.board = board;
+        this.skipDeathCliff = false;
     }
 
     // methods
@@ -207,6 +209,7 @@ public class Game {
     private void setGameOver(Player playerWinner) {
         gameOver = true;
         winner = playerWinner;
+
     }
 
     /**
@@ -226,10 +229,9 @@ public class Game {
             Cliff cliff = board.getCliff(newSquare);
             if(cliff.isCrab()) {
                 newSquare = nextPlayer.getSquare() - totalDicePoints;
-            } else if(cliff.isDeath()) {
+            } else if(!skipDeathCliff && cliff.isDeath() ) {
                 nextPlayer.markAsEliminate();
-                //TODO after one player enters a death cliff, all death cliffs must be erased
-                board.eraseDeathCliffs();
+                skipDeathCliff = true;
             } else if(cliff.isHell()) {
                 newSquare = board.getInitialSquare();
             } else if(cliff.getSquare() == -1){

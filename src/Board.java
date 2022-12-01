@@ -65,14 +65,6 @@ public class Board {
         return i;
     }
 
-    public void eraseDeathCliffs() {
-            for(int i = 0; i < cliffs.length; i++) {
-                if(cliffs[i].isDeath()) {
-                    cliffs[i].eraseCliff();
-                }
-            }
-    }
-
     private int findChargeIndex(int newSquare) {
         int i = 0;
         while (i < charges.length && !charges[i].hasSquare(newSquare)) {
