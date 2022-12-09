@@ -13,6 +13,9 @@ public class Player {
     private int charges;
     private boolean eliminated;
     private boolean firstMove;
+    private int cupOrder;
+    private int wins;
+    private boolean isCupWinner;
 
     // constructors
 
@@ -22,22 +25,71 @@ public class Player {
      * @param name: name of the player
      * @pre: name != null
      */
-    public Player(String name) {
+    public Player(String name, int cupOrder) {
         this.name = name;
-        this.square = 1;
-        this.charges = 0;
-        this.eliminated = false;
-        this.firstMove = true;
+        this.cupOrder = cupOrder;
+        this.wins = 0;
+        this.isCupWinner = false;
+        this.resetForNewGame();
 
     }
 
     // methods
 
+    public boolean isCupWinner() {
+        return isCupWinner;
+    }
+
+    public void markAsCupWinner() {
+        isCupWinner = true;
+        
+    }
+    
+    public int compareTo(Player other) {
+        if(isCupWinner) {
+            return -1;
+        } 
+
+        if(!isEliminated() && other.isEliminated()) {
+            return -1;
+        } else if(isEliminated() && !other.isEliminated()) {
+            return 1;
+        }
+
+        if(wins > other.getWins()) {
+            return -1;
+        } else if(wins < other.getWins()) {
+            return 1;
+        }
+
+        if(square > other.getSquare()) {
+            return -1;
+        } else if(square < other.getSquare()) {
+            return 1;
+        }
+
+        if(cupOrder < other.getOrder()) {
+            return -1;
+        } else if(cupOrder > other.getOrder()){
+            return 1;
+        }
+
+        return 0;
+    }
+
+    public void addWin() {
+        wins++;
+    }
+
+    public int getWins() {
+        return wins;
+    }
+
     public boolean isFirstMove() {
         return firstMove;
     }
 
-    public void markAsEliminate() {
+    public void markAsEliminated() {
         eliminated = true;
     }
 
@@ -100,6 +152,18 @@ public class Player {
      */
     public void payCharge() {
         charges--;
+    }
+
+    public void resetForNewGame() {
+        square = 1;
+        charges = 0;
+        eliminated = false;
+        firstMove = true;
+
+    }
+
+    public int getOrder() {
+        return cupOrder;
     }
 
 }

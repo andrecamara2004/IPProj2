@@ -11,6 +11,7 @@ import java.util.Scanner;
 public class Main {
 
     // constants
+    private static final String RANKING = "ranking";
     private static final String DICE = "dice";
     private static final String STATUS = "status";
     private static final String SQUARE = "square";
@@ -28,7 +29,7 @@ public class Main {
      * 
      * @param args
      */
-    public static void main(String[] args) throws FileNotFoundException{
+    public static void main(String[] args) throws FileNotFoundException {
 
         Scanner in = new Scanner(System.in);
 
@@ -38,17 +39,15 @@ public class Main {
         in.nextLine();
 
         BoardsRepo boardRepo = new BoardsRepo(BOARDS_REPO_FILE_NAME);
-        Board board = boardRepo.getBoardByNumber(boardNumber);
 
-        Game game = new Game(colors, board);
+        CupSystem cup = new CupSystem(colors, boardNumber, boardRepo);
 
-        processCommands(in, game);
+        processCommands(in, cup);
 
         in.close();
     }
 
     // methods
-
 
     /**
      * Creation of the processor of commands
@@ -56,11 +55,11 @@ public class Main {
      * @param in:   the input
      * @param game: the object GameSystem
      */
-    private static void processCommands(Scanner in, Game game) {
+    private static void processCommands(Scanner in, CupSystem cup) {
         String command;
         do {
             command = in.next();
-            processCommand(command, in, game);
+            processCommand(command, in, cup);
         } while (!EXIT.equals(command));
 
     }
@@ -70,24 +69,27 @@ public class Main {
      * 
      * @param command
      * @param in
-     * @param game
+     * @param cup
      */
-    private static void processCommand(String command, Scanner in, Game game) {
+    private static void processCommand(String command, Scanner in, CupSystem cup) {
         switch (command) {
             case PLAYER:
-                processPlayerCommand(in, game);
+                processPlayerCommand(in, cup);
                 break;
             case SQUARE:
-                processSquareCommand(in, game);
+                processSquareCommand(in, cup);
                 break;
             case STATUS:
-                processStatusCommand(in, game);
+                processStatusCommand(in, cup);
                 break;
             case DICE:
-                processDiceCommmand(in, game);
+                processDiceCommmand(in, cup);
+                break;
+            case RANKING:
+                processRankingCommand(cup);
                 break;
             case EXIT:
-                processExitCommand(game);
+                processExitCommand(cup);
                 break;
             default:
                 showInvalidCommand(in);
@@ -96,47 +98,64 @@ public class Main {
         }
     }
 
+    private static void processRankingCommand(CupSystem cup) {
+        PlayerIterator iterator = cup.rankedIterator();
+        while (iterator.hasNext()) {
+            Player player = iterator.getNext();
+            if (!player.isEliminated()) {
+                System.out.printf("%s: %d games won; on square %d.\n",
+                        player.getName(), player.getWins(), player.getSquare());
+            } else {
+                System.out.printf("%s: %d games won; eliminated.\n",
+                        player.getName(), player.getWins());
+
+            }
+        }
+    }
+
     /**
      * processes the dice command, so the players can move
      * 
      * @param in
-     * @param game
+     * @param cup
      */
-    private static void processDiceCommmand(Scanner in, Game game) {
+    private static void processDiceCommmand(Scanner in, CupSystem cup) {
         int pointsDice1 = in.nextInt();
         int pointsDice2 = in.nextInt();
         in.nextLine();
 
-        if (!Game.isDiceValid(pointsDice1, pointsDice2)) {
+        if (!CupSystem.isDiceValid(pointsDice1, pointsDice2)) {
             System.out.println("Invalid dice");
-        } else if (game.isGameOver()) {
-            displayGameIsOver();
+        } else if (cup.isCupOver()) {
+            displayCupIsOver();
         } else {
-            game.rollDice(pointsDice1, pointsDice2);
+            cup.rollDice(pointsDice1, pointsDice2);
         }
 
     }
 
     /**
-     * Displays that the game is over
+     * Displays that the cup is over
      */
-    private static void displayGameIsOver() {
-        System.out.println("The game is over");
+    private static void displayCupIsOver() {
+        System.out.println("The cup is over");
     }
 
     /**
      * processes status command, so we can know if the player can roll the dice
      * 
      * @param in
-     * @param game
+     * @param cup
      */
-    private static void processStatusCommand(Scanner in, Game game) {
+    private static void processStatusCommand(Scanner in, CupSystem cup) {
         String playerColor = readPlayerColorToTheEndOfLine(in);
-        if (!game.isValidPlayer(playerColor)) {
+        if (!cup.isValidPlayer(playerColor)) {
             displayNonexistentPlayer();
-        } else if (game.isGameOver()) {
-            displayGameIsOver();
-        } else if (game.canRollDice(playerColor)) {
+        } else if (cup.isCupOver()) {
+            displayCupIsOver();
+        } else if (cup.isEliminatedPlayer(playerColor)) {
+            displayEliminatedPlayer();
+        } else if (cup.canRollDice(playerColor)) {
             System.out.printf("%s can roll the dice\n", playerColor);
         } else {
             System.out.printf("%s cannot roll the dice\n", playerColor);
@@ -147,16 +166,22 @@ public class Main {
      * processes the square command, so we can know on which square the player is
      * 
      * @param in
-     * @param game
+     * @param cup
      */
-    private static void processSquareCommand(Scanner in, Game game) {
+    private static void processSquareCommand(Scanner in, CupSystem cup) {
         String playerColor = readPlayerColorToTheEndOfLine(in);
-        if (!game.isValidPlayer(playerColor)) {
+        if (!cup.isValidPlayer(playerColor)) {
             displayNonexistentPlayer();
+        } else if (cup.isEliminatedPlayer(playerColor)) {
+            displayEliminatedPlayer();
         } else {
-            int playerSquare = game.getPlayerSquare(playerColor);
+            int playerSquare = cup.getPlayerSquare(playerColor);
             System.out.printf("%s is on square %d\n", playerColor, playerSquare);
         }
+    }
+
+    private static void displayEliminatedPlayer() {
+        System.out.println("Eliminated player");
     }
 
     /**
@@ -182,15 +207,15 @@ public class Main {
      * processes the player command, so we can know the player playing next play
      * 
      * @param in
-     * @param game
+     * @param cup
      */
-    private static void processPlayerCommand(Scanner in, Game game) {
+    private static void processPlayerCommand(Scanner in, CupSystem cup) {
 
         in.nextLine();
-        if (game.isGameOver()) {
-            displayGameIsOver();
+        if (cup.isCupOver()) {
+            displayCupIsOver();
         } else {
-            System.out.printf("Next to play: %s\n", game.getNextPlayerName());
+            System.out.printf("Next to play: %s\n", cup.getNextPlayerName());
         }
     }
 
@@ -205,11 +230,11 @@ public class Main {
      * 
      * @param game: the object game system
      */
-    private static void processExitCommand(Game game) {
-        if (game.isGameOver()) {
-            System.out.printf("%s won the game!\n", game.getWinnerName());
+    private static void processExitCommand(CupSystem cup) {
+        if (cup.isCupOver()) {
+            System.out.printf("%s won the cup!\n", cup.getWinnerName());
         } else {
-            System.out.println("The game was not over yet...");
+            System.out.println("The cup was not over yet...");
         }
     }
 }
