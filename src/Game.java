@@ -202,6 +202,9 @@ public class Game {
             setGameOver(nextPlayer);
         } else {
             updateNextPlayer();
+            if(nextPlayer.isEliminated() && players.length == 2) {
+                setGameOver(getNextPlayer());
+            }
         }
 
     }
